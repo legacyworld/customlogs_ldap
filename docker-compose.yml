@@ -1,0 +1,29 @@
+version: '3'
+services:
+  ldap:
+    build: ./ldap
+    container_name: openldap
+    ports:
+      - "389:389"
+        #- 80:80
+    environment:
+#      - LDAP_LOG_LEVEL=-1
+      - LDAP_DOMAIN=example.com
+      - LDAP_ADMIN_PASSWORD=password
+    volumes:
+      - ./log:/var/log
+  app:
+    build:
+      context: ./app
+    container_name: app
+    ports:
+      - 5000:5000
+    volumes:
+      - ./app:/src
+      - ./log:/log
+        #  playwright:
+        #build:
+        #context: ./playwright
+        #dockerfile: ./Dockerfile
+        #volumes:
+        #- ./app/:/usr/src/app/
