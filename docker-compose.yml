@@ -5,7 +5,6 @@ services:
     container_name: openldap
     ports:
       - "389:389"
-        #- 80:80
     environment:
       - LDAP_LOG_LEVEL=128
       - LDAP_DOMAIN=example.com
