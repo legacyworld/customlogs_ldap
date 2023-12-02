@@ -7,7 +7,7 @@ services:
       - "389:389"
         #- 80:80
     environment:
-#      - LDAP_LOG_LEVEL=-1
+      - LDAP_LOG_LEVEL=128
       - LDAP_DOMAIN=example.com
       - LDAP_ADMIN_PASSWORD=password
     volumes:
@@ -21,9 +21,3 @@ services:
     volumes:
       - ./app:/src
       - ./log:/log
-        #  playwright:
-        #build:
-        #context: ./playwright
-        #dockerfile: ./Dockerfile
-        #volumes:
-        #- ./app/:/usr/src/app/

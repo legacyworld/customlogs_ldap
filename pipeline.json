@@ -1,0 +1,63 @@
+PUT _ingest/pipeline/ldap
+{
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "%{TIMESTAMP_ISO8601:@timestamp} %{HOSTNAME:host.name} %{WORD:process.name}\\[%{NUMBER:process.pid:int}\\]: conn=%{NUMBER:connection_id:int} %{GREEDYDATA:rest}"
+        ],
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "rest",
+        "patterns": [
+          "fd=%{NUMBER:fd:int} %{WORD:action} from IP=%{IP:source.ip}:%{NUMBER:source.port:int} \\(IP=%{IP:destination.ip}:%{NUMBER:destination.port:int}\\)",
+          "op=%{WORD:operation} %{WORD:action} %{GREEDYDATA:rest}",
+          "fd=%{NUMBER:fd:int} %{WORD:action}",
+          "op=%{WORD:operation} %{WORD:action}"
+        ],
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "rest",
+        "patterns": [
+          "dn=\"uid=%{DATA:uid},ou=%{DATA:organizational_unit},dc=%{DATA:domain_component},dc=%{DATA:top_level_domain}\" %{GREEDYDATA:rest}",
+          "tag=%{NUMBER:tag:int} err=%{NUMBER:err:int} text=%{DATA:result_text}"
+        ],
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "grok": {
+        "field": "rest",
+        "patterns": [
+          "method=%{NUMBER:method:int}",
+          "mech=%{DATA:mech} ssf=%{NUMBER:ssf:int}"
+        ],
+        "ignore_missing": true,
+        "ignore_failure": true
+      }
+    },
+    {
+      "remove": {
+        "field": "rest"
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "error",
+        "value": "{{ _ingest.on_failure_message }}"
+      }
+    }
+  ]
+}
